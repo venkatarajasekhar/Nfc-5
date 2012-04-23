@@ -95,7 +95,6 @@ public class NfcService implements DeviceHostListener {
     public static final String PREF = "NfcServicePrefs";
 
     static final String PREF_NFC_ON = "nfc_on";
-    static final boolean NFC_ON_DEFAULT = true;
     static final String PREF_NDEF_PUSH_ON = "ndef_push_on";
     static final boolean NDEF_PUSH_ON_DEFAULT = true;
     static final String PREF_FIRST_BEAM = "first_beam";
@@ -226,6 +225,8 @@ public class NfcService implements DeviceHostListener {
 
     private static NfcService sService;
 
+    private static boolean mNfcOnDefault;
+
     public static void enforceAdminPerm(Context context) {
         context.enforceCallingOrSelfPermission(ADMIN_PERM, ADMIN_PERM_ERROR);
     }
@@ -343,6 +344,8 @@ public class NfcService implements DeviceHostListener {
         mEeRoutingState = ROUTE_OFF;
 
         mNfceeAccessControl = new NfceeAccessControl(mContext);
+
+        mNfcOnDefault = mContext.getResources().getBoolean(R.bool.nfc_on_default);
 
         mPrefs = mContext.getSharedPreferences(PREF, Context.MODE_PRIVATE);
         mPrefsEditor = mPrefs.edit();
@@ -536,7 +539,7 @@ public class NfcService implements DeviceHostListener {
                 case TASK_BOOT:
                     Log.d(TAG,"checking on firmware download");
                     boolean airplaneOverride = mPrefs.getBoolean(PREF_AIRPLANE_OVERRIDE, false);
-                    if (mPrefs.getBoolean(PREF_NFC_ON, NFC_ON_DEFAULT) &&
+                    if (mPrefs.getBoolean(PREF_NFC_ON, mNfcOnDefault) &&
                             (!mIsAirplaneSensitive || !isAirplaneModeOn() || airplaneOverride)) {
                         Log.d(TAG,"NFC is on. Doing normal stuff");
                         enableInternal();
@@ -2018,7 +2021,7 @@ public class NfcService implements DeviceHostListener {
                 mPrefsEditor.apply();
                 if (isAirplaneModeOn) {
                     new EnableDisableTask().execute(TASK_DISABLE);
-                } else if (!isAirplaneModeOn && mPrefs.getBoolean(PREF_NFC_ON, NFC_ON_DEFAULT)) {
+                } else if (!isAirplaneModeOn && mPrefs.getBoolean(PREF_NFC_ON, mNfcOnDefault)) {
                     new EnableDisableTask().execute(TASK_ENABLE);
                 }
             }
