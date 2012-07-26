@@ -275,6 +275,8 @@ static int nfc_jni_unconfigure_driver(struct nfc_jni_native_data *nat)
     int result = FALSE;
     NFCSTATUS status;
 
+    kill_client(nat);
+
     /* Unconfigure driver */
     TRACE("phLibNfc_Mgt_UnConfigureDriver()");
     REENTRANCE_LOCK();
@@ -1808,8 +1810,6 @@ static jboolean com_android_nfc_NfcManager_deinitialize(JNIEnv *e, jobject o)
        ALOGE("Failed to create semaphore (errno=0x%08x)", errno);
        bStackReset = TRUE;
    }
-
-   kill_client(nat);
 
    if(bStackReset == TRUE)
    {
