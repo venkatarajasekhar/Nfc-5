@@ -150,6 +150,24 @@ public class NdefPushServer {
                         }
                         if (serverSocket == null) return;
 
+                    synchronized (this) {
+                        mServerSocket = mService.createLlcpServerSocket(mSap, SERVICE_NAME,
+                                MIU, 1, 1024);
+                        if (mServerSocket == null) {
+                            if (DBG) Log.d(TAG, "failed to create LLCP service socket");
+                            return;
+                        }
+                    }
+                    if (DBG) Log.d(TAG, "created LLCP service socket");
+                    while (mRunning) {
+                        LlcpServerSocket serverSocket;
+                        synchronized (this) {
+                            serverSocket = mServerSocket;
+                        }
+                        if (serverSocket == null) {
+                            if (DBG) Log.d(TAG, "Server socket shut down.");
+                            return;
+                        }
                         if (DBG) Log.d(TAG, "about to accept");
                         LlcpSocket communicationSocket = serverSocket.accept();
                         if (DBG) Log.d(TAG, "accept returned " + communicationSocket);
@@ -165,9 +183,10 @@ public class NdefPushServer {
                 } catch (LlcpException e) {
                     Log.e(TAG, "llcp error", e);
                 } catch (IOException e) {
-                    Log.e(TAG, "IO error", e);
+                    if (DBG) Log.d(TAG, "IO error");
                 } finally {
                     synchronized (NdefPushServer.this) {
+                    synchronized (this) {
                         if (mServerSocket != null) {
                             if (DBG) Log.d(TAG, "about to close");
                             try {
@@ -196,6 +215,13 @@ public class NdefPushServer {
                         // ignore
                     }
                     mServerSocket = null;
+        public synchronized void shutdown() {
+            mRunning = false;
+            if (mServerSocket != null) {
+                try {
+                    mServerSocket.close();
+                } catch (IOException e) {
+                    // ignore
                 }
             }
         }
