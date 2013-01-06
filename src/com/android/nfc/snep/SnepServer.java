@@ -225,7 +225,7 @@ public final class SnepServer {
                 } catch (LlcpException e) {
                     Log.e(TAG, "llcp error", e);
                 } catch (IOException e) {
-                    if (DBG) Log.d(TAG, "IO error");
+                    Log.e(TAG, "IO error", e);
                 } finally {
                     synchronized (SnepServer.this) {
                         if (mServerSocket != null) {

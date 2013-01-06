@@ -100,13 +100,8 @@ static jobject com_NativeLlcpServiceSocket_doAccept(JNIEnv *e, jobject o, jint m
    {
       /* Wait for tag Notification */
       pthread_mutex_lock(&pMonitor->incoming_socket_mutex);
-      pMonitor->server_socket_closed = false;
       while ((hIncomingSocket = getIncomingSocket(pMonitor, hServerSocket)) == NULL) {
          pthread_cond_wait(&pMonitor->incoming_socket_cond, &pMonitor->incoming_socket_mutex);
-         if (pMonitor->server_socket_closed) {
-            pthread_mutex_unlock(&pMonitor->incoming_socket_mutex);
-            goto clean_and_return;
-         }
       }
       pthread_mutex_unlock(&pMonitor->incoming_socket_mutex);
 
@@ -190,7 +185,6 @@ static jboolean com_NativeLlcpServiceSocket_doClose(JNIEnv *e, jobject o)
 
    pthread_mutex_lock(&pMonitor->incoming_socket_mutex);
    /* TODO: implement accept abort */
-   pMonitor->server_socket_closed = true;
    pthread_cond_broadcast(&pMonitor->incoming_socket_cond);
    pthread_mutex_unlock(&pMonitor->incoming_socket_mutex);
 

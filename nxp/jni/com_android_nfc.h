@@ -177,7 +177,6 @@ typedef struct nfc_jni_native_monitor
    LIST_HEAD(, nfc_jni_listen_data) incoming_socket_head;
    pthread_mutex_t incoming_socket_mutex;
    pthread_cond_t  incoming_socket_cond;
-   bool server_socket_closed;
 
 } nfc_jni_native_monitor_t;
 
