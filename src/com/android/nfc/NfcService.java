@@ -1925,11 +1925,16 @@ public class NfcService implements DeviceHostListener {
         @Override
         protected Void doInBackground(Integer... params) {
             synchronized (NfcService.this) {
+                // maxwen: dont do anything if nfc is not enabled
+                if (!isNfcEnabledOrShuttingDown()) {
+                    return null;
+                }
                 if (params == null || params.length != 1) {
                     // force apply current routing
                     applyRouting(true);
                     return null;
                 }
+                
                 mScreenState = params[0].intValue();
 
                 mRoutingWakeLock.acquire();
