@@ -15,10 +15,24 @@ public class NfcApplication extends Application {
 
     @Override
     public void onCreate() {
+        try{
         super.onCreate();
+        }catch (Exception e) {
+             System.out.println(e);
+            } 
+       finally {
+       System.out.println("finally block will execute always.");
+    }
 
         if (UserHandle.myUserId() == 0) {
+            try{
             mNfcService = new NfcService(this);
+            }catch (Exception e) {
+             System.out.println(e);
+            } 
+       finally {
+       System.out.println("finally block will execute always.");
+    }
         }
     }
 }
