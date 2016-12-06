@@ -36,4 +36,10 @@ public class LlcpException extends Exception {
     public LlcpException(int error) {
         super(ErrorCodes.asString(error));
     }
+    Exception (String message, 
+                Throwable cause, 
+                boolean enableSuppression, 
+                boolean writableStackTrace);
+    AndroidException (Exception cause);
+    
 }
